@@ -256,9 +256,9 @@ window.addEventListener('DOMContentLoaded', function() {
         thanksModal.classList.add('modal__dialog');
         thanksModal.innerHTML = `
             <div class="modal__content">
-                <div class="modal__close" data-close>×<div>
-                <div class="modal__title">${message}<div>
-            <div>
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
         `;
 
         document.querySelector('.modal').append(thanksModal);
@@ -267,6 +267,6 @@ window.addEventListener('DOMContentLoaded', function() {
             prevModalDialog.classList.add("show");
             prevModalDialog.classList.remove("hide");
             closeModal();
-        }, 40000)
+        }, 4000)
     }
 });
