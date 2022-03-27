@@ -182,12 +182,27 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // const getResource = async(url) => {
+    //     const res = await fetch(url)
+    //     if (!res.ok) {
+    //         throw new Error(`Could not fetch! ${url}, status ${res.status}`);
+    //     }
+    //     return await res.json();
+    // };
+
     // getResource('http://localhost:3000/menu')
     //     .then(data => {
     //         data.forEach(({ img, altimg, title, descr, price }) => {
     //             new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
     //         });
     //     });
+
+    axios.get("http://localhost:3000/menu") // axios lib
+        .then(data => {
+            data.data.forEach(({ img, altimg, title, descr, price }) => {
+                new MenuCard(img, altimg, title, descr, price, ".menu .container").render();
+            });
+        });
 
     // server post (forms)
 
@@ -202,26 +217,18 @@ window.addEventListener('DOMContentLoaded', function() {
         bindPostData(item);
     })
 
-    const postData = async(url, data) => {
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: data
-        });
+    // const postData = async(url, data) => {
+    //     const res = await fetch(url, {
+    //         method: "POST",
+    //         headers: {
+    //             'Content-type': 'application/json'
+    //         },
+    //         body: data
+    //     });
 
-        return await res.json();
+    //     return await res.json();
 
-    };
-
-    async function getResource(url) {
-        const res = await fetch(url)
-        if (!res.ok) {
-            throw new Error(`Could not fetch! ${url}, status ${res.status}`);
-        }
-        return await res.json();
-    };
+    // };
 
     function bindPostData(form) {
         form.addEventListener('submit', (e) => {
@@ -245,9 +252,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            postData('http://localhost:3000/requests', json)
+            axios.post('http://localhost:3000/requests', json)
                 .then(data => {
-                    console.log(data);
+                    console.log(data.data);
                     showThanksModal(message.success);
                     statusMessage.remove();
                 }).catch(() => {
@@ -282,4 +289,55 @@ window.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }, 4000)
     }
+
+    //Slider
+
+    const sliderPrev = document.querySelector('.offer__slider-prev');
+    const sliderNext = document.querySelector('.offer__slider-next');
+    const slides = document.querySelectorAll('.offer__slide');
+    const total = document.querySelector('#total');
+    const currentNumb = document.querySelector('#current')
+
+    let slideIndex = 1;
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`
+    } else {
+        total.textContent = slides.length;
+    }
+
+    showSlides(slideIndex);
+
+    function showSlides(n) {
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+
+        slides.forEach((item) => item.style.display = 'none');
+        slides[slideIndex - 1].style.display = 'block';
+
+        if (slides.length < 10) {
+            currentNumb.textContent = `0${slideIndex}`
+        } else {
+            currentNumb.textContent = slideIndex;
+        }
+    };
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    };
+
+    sliderPrev.addEventListener('click', () => {
+        plusSlides(-1)
+    });
+
+
+    sliderNext.addEventListener('click', () => {
+        plusSlides(1)
+    });
+
 });
