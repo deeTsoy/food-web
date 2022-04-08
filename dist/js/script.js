@@ -433,55 +433,25 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // if (slides.length < 10) {
-    //     total.textContent = `0${slides.length}`
-    // } else {
-    //     total.textContent = slides.length;
-    // }
-
-    // showSlides(slideIndex);
-
-    // function showSlides(n) {
-    //     if (n > slides.length) {
-    //         slideIndex = 1;
-    //     }
-
-    //     if (n < 1) {
-    //         slideIndex = slides.length;
-    //     }
-
-    //     slides.forEach((item) => item.style.display = 'none');
-    //     slides[slideIndex - 1].style.display = 'block';
-
-    //     if (slides.length < 10) {
-    //         currentNumb.textContent = `0${slideIndex}`
-    //     } else {
-    //         currentNumb.textContent = slideIndex;
-    //     }
-    // };
-
-    // function plusSlides(n) {
-    //     showSlides(slideIndex += n);
-    // };
-
-    // sliderPrev.addEventListener('click', () => {
-    //     plusSlides(-1)
-    // });
-
-
-    // sliderNext.addEventListener('click', () => {
-    //     plusSlides(1)
-    // });
-
-
     //Calc
 
     const result = document.querySelector(".calculating__result span");
-    let sex = 'female',
-        height,
-        weight,
-        age,
+
+    let sex, height, weight, age, ratio;
+
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex');
+    } else {
+        sex = 'female';
+        localStorage.setItem('sex', 'female');
+    }
+
+    if (localStorage.getItem('ratio')) {
+        ratio = localStorage.getItem('ratio');
+    } else {
         ratio = 1.375;
+        localStorage.setItem('ratio', 1.375);
+    }
 
     function calcTotal() {
         if (!sex || !height || !weight || !age) {
@@ -495,17 +465,35 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    function initLocalSet(selector, activeClass) {
+        const elements = document.querySelectorAll(selector)
+
+        elements.forEach(elem => {
+            elem.classList.remove(activeClass);
+            if (elem.getAttribute('id') === localStorage.getItem('sex')) {
+                elem.classList.add(activeClass);
+            }
+            if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                elem.classList.add(activeClass);
+            }
+        });
+    };
+    initLocalSet('#gender div', 'calculating__choose-item_active');
+    initLocalSet('.calculating__choose_big div', 'calculating__choose-item_active');
+
     calcTotal();
 
-    function getStaticInfo(parentSelector, activeClass) {
-        const elements = document.querySelectorAll(`${parentSelector} div`);
+    function getStaticInfo(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
 
         elements.forEach(elem => {
             elem.addEventListener('click', (e) => {
                 if (e.target.getAttribute('data-ratio')) {
                     ratio = +e.target.getAttribute('data-ratio');
+                    localStorage.setItem('ratio', +e.target.getAttribute('data-ratio'));
                 } else {
                     sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', e.target.getAttribute('id'))
                 }
 
                 elements.forEach(elm => {
@@ -519,14 +507,21 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    getStaticInfo('#gender', 'calculating__choose-item_active');
-    getStaticInfo('.calculating__choose_big', 'calculating__choose-item_active');
+    getStaticInfo('#gender div', 'calculating__choose-item_active');
+    getStaticInfo('.calculating__choose_big div', 'calculating__choose-item_active');
 
 
     function getDynamicInfo(selector) {
         const input = document.querySelector(selector);
 
         input.addEventListener('input', () => {
+
+            if (input.value.match(/\D/ig)) {
+                input.style.border = '1px solid red';
+            } else {
+                input.style.border = 'none';
+            }
+
             switch (input.getAttribute('id')) {
                 case 'height':
                     height = +input.value;
